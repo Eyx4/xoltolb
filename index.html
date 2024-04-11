@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>alpha 0.08.2</title>
+    <title>xoltolb alpha 0.08.3</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -146,7 +146,8 @@
         const username = document.getElementById('login-username').value;
         const password = document.getElementById('login-password').value;
         // Simulated authentication logic (not secure)
-        if (username && password && members.some(member => member.username === username)) {
+        const user = members.find(member => member.username === username && member.password === password);
+        if (user) {
             currentUser = username;
             localStorage.setItem('currentUser', currentUser); // Save current user to localStorage
             updateStatus();
@@ -157,14 +158,18 @@
     function register() {
         const username = document.getElementById('register-username').value;
         const password = document.getElementById('register-password').value;
-        // Simulated registration logic (not secure)
-        if (username && password) {
-            const userId = members.length + 1; // Generate unique ID based on registration order
-            members.push({ id: userId, username: username });
-            localStorage.setItem('members', JSON.stringify(members)); // Save updated members list to localStorage
-            localStorage.setItem('currentUser', username); // Save current user to localStorage
-            updateStatus();
+        // Check if username is already taken
+        if (members.some(member => member.username === username)) {
+            alert('Username already taken. Please choose another.');
+            return;
         }
+        // Simulated registration logic (not secure)
+        const userId = members.length + 1; // Generate unique ID based on registration order
+        members.push({ id: userId, username: username, password: password });
+        localStorage.setItem('members', JSON.stringify(members)); // Save updated members list to localStorage
+        localStorage.setItem('currentUser', username); // Save current user to localStorage
+        currentUser = username;
+        updateStatus();
         hideRegistrationForm();
     }
 
