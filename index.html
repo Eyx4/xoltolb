@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>alpha 0.07.8</title>
+    <title>alpha 0.07.9</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -116,8 +116,9 @@
 
     function importCurrentUser() {
         // Check if currentUser is not already in members array
-        if (!members.includes(currentUser)) {
-            members.unshift(currentUser); // Add current user to the beginning of the array
+        if (!members.some(member => member.username === currentUser)) {
+            const joinDate = new Date().toLocaleDateString(); // Get current date as join date
+            members.unshift({ username: currentUser, joinDate: joinDate }); // Add current user to the beginning of the array with join date
         }
     }
 
@@ -150,10 +151,9 @@
         // Add members to the list
         members.forEach(member => {
             const li = document.createElement('li');
-            li.textContent = member;
-            if (member === currentUser) {
+            li.textContent = `${member.username} (Joined: ${member.joinDate})`;
+            if (member.username === currentUser) {
                 li.classList.add('current-user'); // Highlight current user's username
-                li.textContent += ' (You)'; // Add indicator for current user
             }
             memberList.appendChild(li);
         });
