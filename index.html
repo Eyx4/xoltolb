@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xoltolb alpha 0.07.4</title>
+    <title>xoltolb alpha 0.07.5</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -51,6 +51,18 @@
     let currentUser = null;
     let members = [];
 
+    // Load members from localStorage on page load
+    if (localStorage.getItem('members')) {
+        members = JSON.parse(localStorage.getItem('members'));
+        updateMemberList();
+    }
+
+    // Load current user from localStorage on page load
+    if (localStorage.getItem('currentUser')) {
+        currentUser = localStorage.getItem('currentUser');
+        updateStatus();
+    }
+
     function showLoginForm() {
         hideRegistrationForm();
         document.getElementById('login-form').style.display = 'block';
@@ -75,6 +87,7 @@
         // Simulated authentication logic (not secure)
         if (username && password) {
             currentUser = username;
+            localStorage.setItem('currentUser', currentUser); // Save current user to localStorage
             updateStatus();
         }
         hideLoginForm();
@@ -86,7 +99,9 @@
         // Simulated registration logic (not secure)
         if (username && password) {
             currentUser = username;
+            localStorage.setItem('currentUser', currentUser); // Save current user to localStorage
             members.unshift(username); // Add new member to the beginning of the array
+            saveMembers();
             updateStatus();
             updateMemberList();
         }
@@ -110,6 +125,7 @@
 
     function signOut() {
         currentUser = null;
+        localStorage.removeItem('currentUser'); // Remove current user from localStorage
         updateStatus();
     }
 
@@ -125,12 +141,12 @@
         });
     }
 
-    // Simulated initial member list (loaded from saved data)
-    members = ['User1', 'User2', 'User3']; // Example existing members
+    function saveMembers() {
+        localStorage.setItem('members', JSON.stringify(members));
+    }
 
     // Display initial status and member list
     updateStatus();
-    updateMemberList();
 </script>
 
 </body>
