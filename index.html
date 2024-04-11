@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>alpha 0.08.1</title>
+    <title>alpha 0.08.2</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -159,10 +159,10 @@
         const password = document.getElementById('register-password').value;
         // Simulated registration logic (not secure)
         if (username && password) {
-            currentUser = username;
-            members.push({ username: username });
+            const userId = members.length + 1; // Generate unique ID based on registration order
+            members.push({ id: userId, username: username });
             localStorage.setItem('members', JSON.stringify(members)); // Save updated members list to localStorage
-            localStorage.setItem('currentUser', currentUser); // Save current user to localStorage
+            localStorage.setItem('currentUser', username); // Save current user to localStorage
             updateStatus();
         }
         hideRegistrationForm();
@@ -233,7 +233,7 @@
 
         displayedMembers.forEach(member => {
             const li = document.createElement('li');
-            li.textContent = member.username;
+            li.textContent = `[ID: ${member.id}] ${member.username}`;
             if (member.username === currentUser) {
                 li.classList.add('current-user'); // Highlight current user's username
             }
@@ -247,7 +247,8 @@
         const container = document.getElementById('pagination');
         container.innerHTML = ''; // Clear previous pagination
 
-        const totalPages = Math.ceil((containerId === 'forum' ? forumMessages.length : members.length) / itemsPerPage);
+        const totalItems = containerId === 'forum' ? forumMessages.length : members.length;
+        const totalPages = Math.ceil(totalItems / itemsPerPage);
 
         for (let i = 1; i <= totalPages; i++) {
             const pageButton = document.createElement('button');
