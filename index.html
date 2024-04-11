@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>xoltolb alpha 0.07.5</title>
+    <title>xoltolb alpha 0.07.6</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -13,6 +13,10 @@
             margin-top: 20px;
             border: 1px solid #ccc;
             padding: 10px;
+        }
+        .current-user {
+            font-weight: bold;
+            color: green;
         }
     </style>
 </head>
@@ -133,10 +137,13 @@
         const memberList = document.getElementById('members');
         memberList.innerHTML = ''; // Clear previous list
 
-        // Add members to the list in reverse order (from oldest to newest)
+        // Add members to the list
         members.forEach(member => {
             const li = document.createElement('li');
             li.textContent = member;
+            if (member === currentUser) {
+                li.classList.add('current-user'); // Highlight current user's username
+            }
             memberList.appendChild(li);
         });
     }
