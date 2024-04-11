@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>alpha 0.08</title>
+    <title>alpha 0.08.1</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -21,11 +21,17 @@
             list-style-type: none;
             padding: 0;
         }
-        #forum-messages li {
-            margin-bottom: 10px;
+        #member-list {
+            border: 1px solid #ccc;
             padding: 10px;
-            border: 1px solid #ddd;
-            background-color: #f9f9f9;
+            margin-top: 20px;
+        }
+        #member-list ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .current-page {
+            font-weight: bold;
         }
     </style>
 </head>
@@ -63,10 +69,18 @@
     <ul id="forum-messages"></ul>
 </div>
 
+<div id="member-list" style="display: none;">
+    <h2>Member List</h2>
+    <ul id="members"></ul>
+    <div id="pagination"></div>
+</div>
+
 <script>
     let currentUser = null;
     let members = [];
     let forumMessages = [];
+    let currentPage = 1;
+    const itemsPerPage = 20;
 
     // Load members from localStorage on page load
     if (localStorage.getItem('members')) {
@@ -107,12 +121,25 @@
     function showForum() {
         hideLoginForm();
         hideRegistrationForm();
+        hideMemberList();
         document.getElementById('forum').style.display = 'block';
         updateForum();
     }
 
     function hideForum() {
         document.getElementById('forum').style.display = 'none';
+    }
+
+    function showMemberList() {
+        hideLoginForm();
+        hideRegistrationForm();
+        hideForum();
+        document.getElementById('member-list').style.display = 'block';
+        updateMemberList();
+    }
+
+    function hideMemberList() {
+        document.getElementById('member-list').style.display = 'none';
     }
 
     function signIn() {
@@ -147,6 +174,7 @@
                 <p><strong>Status:</strong> Signed in as ${currentUser}</p>
                 <button onclick="signOut()">Sign Out</button>
                 <button onclick="showForum()">Open Forum</button>
+                <button onclick="showMemberList()">View Members</button>
             `;
         } else {
             document.getElementById('user-status').innerHTML = `
@@ -182,11 +210,61 @@
         const forumMessagesList = document.getElementById('forum-messages');
         forumMessagesList.innerHTML = ''; // Clear previous messages
 
-        forumMessages.forEach(message => {
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const displayedMessages = forumMessages.slice(startIndex, endIndex);
+
+        displayedMessages.forEach(message => {
             const li = document.createElement('li');
             li.textContent = `[${message.timestamp}] ${message.username}: ${message.text}`;
             forumMessagesList.appendChild(li);
         });
+
+        renderPagination('forum');
+    }
+
+    function updateMemberList() {
+        const memberList = document.getElementById('members');
+        memberList.innerHTML = ''; // Clear previous list
+
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const displayedMembers = members.slice(startIndex, endIndex);
+
+        displayedMembers.forEach(member => {
+            const li = document.createElement('li');
+            li.textContent = member.username;
+            if (member.username === currentUser) {
+                li.classList.add('current-user'); // Highlight current user's username
+            }
+            memberList.appendChild(li);
+        });
+
+        renderPagination('member-list');
+    }
+
+    function renderPagination(containerId) {
+        const container = document.getElementById('pagination');
+        container.innerHTML = ''; // Clear previous pagination
+
+        const totalPages = Math.ceil((containerId === 'forum' ? forumMessages.length : members.length) / itemsPerPage);
+
+        for (let i = 1; i <= totalPages; i++) {
+            const pageButton = document.createElement('button');
+            pageButton.textContent = i;
+            if (i === currentPage) {
+                pageButton.classList.add('current-page');
+            }
+            pageButton.onclick = () => {
+                currentPage = i;
+                if (containerId === 'forum') {
+                    updateForum();
+                } else if (containerId === 'member-list') {
+                    updateMemberList();
+                }
+            };
+            container.appendChild(pageButton);
+        }
     }
 
     // Display initial status
