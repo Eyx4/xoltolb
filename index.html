@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>xoltolb alpha 0.07.6</title>
+    <title>xoltolb alpha 0.07.7</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -22,7 +22,7 @@
 </head>
 <body>
 
-<h1>Membership System</h1>
+<h1>alpha 0.07.7</h1>
 
 <div id="user-status">
     <p><strong>Status:</strong> Guest</p>
@@ -93,6 +93,7 @@
             currentUser = username;
             localStorage.setItem('currentUser', currentUser); // Save current user to localStorage
             updateStatus();
+            updateMemberList(); // Update member list with current user
         }
         hideLoginForm();
     }
@@ -107,7 +108,7 @@
             members.unshift(username); // Add new member to the beginning of the array
             saveMembers();
             updateStatus();
-            updateMemberList();
+            updateMemberList(); // Update member list with current user
         }
         hideRegistrationForm();
     }
@@ -131,6 +132,7 @@
         currentUser = null;
         localStorage.removeItem('currentUser'); // Remove current user from localStorage
         updateStatus();
+        updateMemberList(); // Update member list after sign out
     }
 
     function updateMemberList() {
@@ -143,6 +145,7 @@
             li.textContent = member;
             if (member === currentUser) {
                 li.classList.add('current-user'); // Highlight current user's username
+                li.textContent += ' (You)'; // Add indicator for current user
             }
             memberList.appendChild(li);
         });
