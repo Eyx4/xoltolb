@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>xoltolb alpha 0.07.7</title>
+    <title>alpha 0.07.8</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -22,7 +22,7 @@
 </head>
 <body>
 
-<h1>alpha 0.07.7</h1>
+<h1>Membership System</h1>
 
 <div id="user-status">
     <p><strong>Status:</strong> Guest</p>
@@ -92,6 +92,7 @@
         if (username && password) {
             currentUser = username;
             localStorage.setItem('currentUser', currentUser); // Save current user to localStorage
+            importCurrentUser(); // Add current user to members list
             updateStatus();
             updateMemberList(); // Update member list with current user
         }
@@ -105,12 +106,19 @@
         if (username && password) {
             currentUser = username;
             localStorage.setItem('currentUser', currentUser); // Save current user to localStorage
-            members.unshift(username); // Add new member to the beginning of the array
+            importCurrentUser(); // Add current user to members list
             saveMembers();
             updateStatus();
             updateMemberList(); // Update member list with current user
         }
         hideRegistrationForm();
+    }
+
+    function importCurrentUser() {
+        // Check if currentUser is not already in members array
+        if (!members.includes(currentUser)) {
+            members.unshift(currentUser); // Add current user to the beginning of the array
+        }
     }
 
     function updateStatus() {
