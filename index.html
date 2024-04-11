@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xoltolb alpha 0.07.4</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        #member-list {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Membership System</h1>
+
+<div id="user-status">
+    <p><strong>Status:</strong> Guest</p>
+    <button onclick="showLoginForm()">Sign In</button>
+    <button onclick="showRegistrationForm()">Register</button>
+</div>
+
+<div id="login-form" style="display: none;">
+    <h2>Sign In</h2>
+    <input type="text" id="login-username" placeholder="Username"><br>
+    <input type="password" id="login-password" placeholder="Password"><br>
+    <button onclick="signIn()">Sign In</button>
+    <button onclick="hideLoginForm()">Cancel</button>
+</div>
+
+<div id="register-form" style="display: none;">
+    <h2>Register</h2>
+    <input type="text" id="register-username" placeholder="Choose a Username"><br>
+    <input type="password" id="register-password" placeholder="Choose a Password"><br>
+    <button onclick="register()">Register</button>
+    <button onclick="hideRegistrationForm()">Cancel</button>
+</div>
+
+<div id="member-list">
+    <h2>Member List</h2>
+    <ul id="members"></ul>
+</div>
+
+<script>
+    let currentUser = null;
+    let members = [];
+
+    function showLoginForm() {
+        hideRegistrationForm();
+        document.getElementById('login-form').style.display = 'block';
+    }
+
+    function hideLoginForm() {
+        document.getElementById('login-form').style.display = 'none';
+    }
+
+    function showRegistrationForm() {
+        hideLoginForm();
+        document.getElementById('register-form').style.display = 'block';
+    }
+
+    function hideRegistrationForm() {
+        document.getElementById('register-form').style.display = 'none';
+    }
+
+    function signIn() {
+        const username = document.getElementById('login-username').value;
+        const password = document.getElementById('login-password').value;
+        // Simulated authentication logic (not secure)
+        if (username && password) {
+            currentUser = username;
+            updateStatus();
+        }
+        hideLoginForm();
+    }
+
+    function register() {
+        const username = document.getElementById('register-username').value;
+        const password = document.getElementById('register-password').value;
+        // Simulated registration logic (not secure)
+        if (username && password) {
+            currentUser = username;
+            members.unshift(username); // Add new member to the beginning of the array
+            updateStatus();
+            updateMemberList();
+        }
+        hideRegistrationForm();
+    }
+
+    function updateStatus() {
+        if (currentUser) {
+            document.getElementById('user-status').innerHTML = `
+                <p><strong>Status:</strong> Signed in as ${currentUser}</p>
+                <button onclick="signOut()">Sign Out</button>
+            `;
+        } else {
+            document.getElementById('user-status').innerHTML = `
+                <p><strong>Status:</strong> Guest</p>
+                <button onclick="showLoginForm()">Sign In</button>
+                <button onclick="showRegistrationForm()">Register</button>
+            `;
+        }
+    }
+
+    function signOut() {
+        currentUser = null;
+        updateStatus();
+    }
+
+    function updateMemberList() {
+        const memberList = document.getElementById('members');
+        memberList.innerHTML = ''; // Clear previous list
+
+        // Add members to the list in reverse order (from oldest to newest)
+        members.forEach(member => {
+            const li = document.createElement('li');
+            li.textContent = member;
+            memberList.appendChild(li);
+        });
+    }
+
+    // Simulated initial member list (loaded from saved data)
+    members = ['User1', 'User2', 'User3']; // Example existing members
+
+    // Display initial status and member list
+    updateStatus();
+    updateMemberList();
+</script>
+
+</body>
+</html>
