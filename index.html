@@ -3,26 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>alpha 0.07.9</title>
+    <title>alpha 0.08</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             padding: 20px;
         }
-        #member-list {
-            margin-top: 20px;
+        #user-status {
+            margin-bottom: 20px;
+        }
+        #forum {
             border: 1px solid #ccc;
             padding: 10px;
+            margin-top: 20px;
         }
-        .current-user {
-            font-weight: bold;
-            color: green;
+        #forum-messages {
+            list-style-type: none;
+            padding: 0;
+        }
+        #forum-messages li {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
         }
     </style>
 </head>
 <body>
 
-<h1>Membership System</h1>
+<h1>Membership & Forum System</h1>
 
 <div id="user-status">
     <p><strong>Status:</strong> Guest</p>
@@ -46,19 +55,29 @@
     <button onclick="hideRegistrationForm()">Cancel</button>
 </div>
 
-<div id="member-list">
-    <h2>Member List</h2>
-    <ul id="members"></ul>
+<div id="forum" style="display: none;">
+    <h2>Forum</h2>
+    <textarea id="message-text" placeholder="Write your message..." rows="4" cols="50"></textarea><br>
+    <button onclick="postMessage()">Post</button>
+    <button onclick="hideForum()">Close Forum</button>
+    <ul id="forum-messages"></ul>
 </div>
 
 <script>
     let currentUser = null;
     let members = [];
+    let forumMessages = [];
 
     // Load members from localStorage on page load
     if (localStorage.getItem('members')) {
         members = JSON.parse(localStorage.getItem('members'));
         updateMemberList();
+    }
+
+    // Load forum messages from localStorage on page load
+    if (localStorage.getItem('forumMessages')) {
+        forumMessages = JSON.parse(localStorage.getItem('forumMessages'));
+        updateForum();
     }
 
     // Load current user from localStorage on page load
@@ -85,16 +104,25 @@
         document.getElementById('register-form').style.display = 'none';
     }
 
+    function showForum() {
+        hideLoginForm();
+        hideRegistrationForm();
+        document.getElementById('forum').style.display = 'block';
+        updateForum();
+    }
+
+    function hideForum() {
+        document.getElementById('forum').style.display = 'none';
+    }
+
     function signIn() {
         const username = document.getElementById('login-username').value;
         const password = document.getElementById('login-password').value;
         // Simulated authentication logic (not secure)
-        if (username && password) {
+        if (username && password && members.some(member => member.username === username)) {
             currentUser = username;
             localStorage.setItem('currentUser', currentUser); // Save current user to localStorage
-            importCurrentUser(); // Add current user to members list
             updateStatus();
-            updateMemberList(); // Update member list with current user
         }
         hideLoginForm();
     }
@@ -105,21 +133,12 @@
         // Simulated registration logic (not secure)
         if (username && password) {
             currentUser = username;
+            members.push({ username: username });
+            localStorage.setItem('members', JSON.stringify(members)); // Save updated members list to localStorage
             localStorage.setItem('currentUser', currentUser); // Save current user to localStorage
-            importCurrentUser(); // Add current user to members list
-            saveMembers();
             updateStatus();
-            updateMemberList(); // Update member list with current user
         }
         hideRegistrationForm();
-    }
-
-    function importCurrentUser() {
-        // Check if currentUser is not already in members array
-        if (!members.some(member => member.username === currentUser)) {
-            const joinDate = new Date().toLocaleDateString(); // Get current date as join date
-            members.unshift({ username: currentUser, joinDate: joinDate }); // Add current user to the beginning of the array with join date
-        }
     }
 
     function updateStatus() {
@@ -127,6 +146,7 @@
             document.getElementById('user-status').innerHTML = `
                 <p><strong>Status:</strong> Signed in as ${currentUser}</p>
                 <button onclick="signOut()">Sign Out</button>
+                <button onclick="showForum()">Open Forum</button>
             `;
         } else {
             document.getElementById('user-status').innerHTML = `
@@ -141,29 +161,35 @@
         currentUser = null;
         localStorage.removeItem('currentUser'); // Remove current user from localStorage
         updateStatus();
-        updateMemberList(); // Update member list after sign out
     }
 
-    function updateMemberList() {
-        const memberList = document.getElementById('members');
-        memberList.innerHTML = ''; // Clear previous list
+    function postMessage() {
+        const messageText = document.getElementById('message-text').value;
+        if (messageText) {
+            const message = {
+                username: currentUser,
+                text: messageText,
+                timestamp: new Date().toLocaleString() // Store timestamp as a readable string
+            };
+            forumMessages.push(message);
+            localStorage.setItem('forumMessages', JSON.stringify(forumMessages)); // Save updated forum messages to localStorage
+            updateForum();
+            document.getElementById('message-text').value = ''; // Clear message input field after posting
+        }
+    }
 
-        // Add members to the list
-        members.forEach(member => {
+    function updateForum() {
+        const forumMessagesList = document.getElementById('forum-messages');
+        forumMessagesList.innerHTML = ''; // Clear previous messages
+
+        forumMessages.forEach(message => {
             const li = document.createElement('li');
-            li.textContent = `${member.username} (Joined: ${member.joinDate})`;
-            if (member.username === currentUser) {
-                li.classList.add('current-user'); // Highlight current user's username
-            }
-            memberList.appendChild(li);
+            li.textContent = `[${message.timestamp}] ${message.username}: ${message.text}`;
+            forumMessagesList.appendChild(li);
         });
     }
 
-    function saveMembers() {
-        localStorage.setItem('members', JSON.stringify(members));
-    }
-
-    // Display initial status and member list
+    // Display initial status
     updateStatus();
 </script>
 
